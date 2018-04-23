@@ -48,7 +48,7 @@ class User(AbstractBaseUser):
     objects = UserManager()
 
     def is_admin(self):
-        return self.admin_type == AdminType.ADMIN
+        return self.admin_type in [AdminType.ADMIN, AdminType.SUPER_ADMIN]
 
     def is_super_admin(self):
         return self.admin_type == AdminType.SUPER_ADMIN
@@ -57,10 +57,10 @@ class User(AbstractBaseUser):
         return self.admin_type in [AdminType.ADMIN, AdminType.SUPER_ADMIN]
 
     def can_mgmt_all_problem(self):
-        return self.problem_permission == ProblemPermission.ALL
+        return self.problem_permission == ProblemPermission.ALL or self.admin_type == AdminType.SUPER_ADMIN
 
     def is_contest_admin(self, contest):
-        return self.is_authenticated() and (contest.created_by == self or self.admin_type == AdminType.SUPER_ADMIN)
+        return self.is_authenticated and (contest.created_by == self or self.admin_type == AdminType.SUPER_ADMIN)
 
     class Meta:
         db_table = "user"
